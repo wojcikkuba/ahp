@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wybór Samochodu - AHP</title>
+</head>
+<body>
+    <h2>Oceń warianty samochodów</h2>
+    <form action="/calculate" method="post">
+
+        <h3>Cena:</h3>
+        <label for="cena_vw_audi">Volkswagen vs Audi:</label>
+        <input type="number" id="cena_vw_audi" name="cena_vw_audi" min="1" max="9"><br><br>
+
+        <label for="cena_vw_skoda">Volkswagen vs Skoda:</label>
+        <input type="number" id="cena_vw_skoda" name="cena_vw_skoda" min="1" max="9"><br><br>
+
+        <label for="cena_audi_skoda">Audi vs Skoda:</label>
+        <input type="number" id="cena_audi_skoda" name="cena_audi_skoda" min="1" max="9"><br><br>
+
+        <h3>Osiągi:</h3>
+        <label for="osiagi_vw_audi">Volkswagen vs Audi:</label>
+        <input type="number" id="osiagi_vw_audi" name="osiagi_vw_audi" min="1" max="9"><br><br>
+
+        <label for="osiagi_vw_skoda">Volkswagen vs Skoda:</label>
+        <input type="number" id="osiagi_vw_skoda" name="osiagi_vw_skoda" min="1" max="9"><br><br>
+
+        <label for="osiagi_audi_skoda">Audi vs Skoda:</label>
+        <input type="number" id="osiagi_audi_skoda" name="osiagi_audi_skoda" min="1" max="9"><br><br>
+
+        <h3>Wygląd:</h3>
+        <label for="wyglad_vw_audi">Volkswagen vs Audi:</label>
+        <input type="number" id="wyglad_vw_audi" name="wyglad_vw_audi" min="1" max="9"><br><br>
+
+        <label for="wyglad_vw_skoda">Volkswagen vs Skoda:</label>
+        <input type="number" id="wyglad_vw_skoda" name="wyglad_vw_skoda" min="1" max="9"><br><br>
+
+        <label for="wyglad_audi_skoda">Audi vs Skoda:</label>
+        <input type="number" id="wyglad_audi_skoda" name="wyglad_audi_skoda" min="1" max="9"><br><br>
+
+        <input type="submit" value="Oblicz najlepszy wariant">
+    </form>
+</body>
+</html>
