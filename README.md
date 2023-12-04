@@ -18,4 +18,6 @@ wyniki(preferencja danego uzytkownika, koncowa, zabawa statystykami)
 + zabawa konsekwencją
 próba podbicia konsekwentności
 czy dany uzytkownik byl konsekwentny itp (jesli nie, mozna o tym poinformować)
-  
+
+
+https://www.youtube.com/playlist?list=PLFsDe5VTL0GNqwwRzZKoitVnWgHIG9jjr
