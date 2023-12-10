@@ -45,23 +45,23 @@ def calculate():
 
         # Odczyt i zapis do pliku JSON
         file_name = 'results.json'
-        user_name = data.get('userName', 'Unknown')  # pobieranie nazwy użytkownika z danych JSON
-
-        try:
-            # Odczytanie istniejących danych z pliku, jeśli plik istnieje
-            with open(file_name, 'r') as file:
-                results_data = json.load(file)
-        except FileNotFoundError:
-            results_data = {}
-
-        # Dodanie nowych wyników
-        results_data[user_name] = {
+        survey_result = {
             'best_variant': best_variant,
             'results': results,
             'scores': final_scores.tolist(),
             'consistency_ratios': consistency_ratios,
             'is_consistent': not inconsistent_criteria
         }
+
+        try:
+            # Odczytanie istniejących danych z pliku, jeśli plik istnieje
+            with open(file_name, 'r') as file:
+                results_data = json.load(file)
+        except FileNotFoundError:
+            results_data = []
+
+        # Dodanie wyniku ankiety do listy
+        results_data.append(survey_result)
 
         # Zapisanie zmodyfikowanych danych do pliku
         with open(file_name, 'w') as file:
@@ -72,13 +72,7 @@ def calculate():
             return jsonify({"error": "Inconsistent answers for criteria: " + ", ".join(inconsistent_criteria)}), 400
 
         # Zwracanie wyników jako odpowiedź API
-        return jsonify({
-            'best_variant': best_variant,
-            'scores': final_scores.tolist(),
-            'results': results,
-            'consistency_ratios': consistency_ratios,
-            'is_consistent': True
-        })
+        return jsonify(survey_result)
 
     except ValueError:
         return jsonify({"error": "Invalid data format"}), 400
