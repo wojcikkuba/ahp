@@ -1,1 +1,41 @@
-<p>results works!</p>
+<div class="component">
+    <h1>Results</h1>
+    <mat-accordion #accordion class="accordion">
+        <mat-expansion-panel *ngFor="let form of forms; let i = index" #panel>
+            <mat-expansion-panel-header (click)="togglePanel(panel)">
+                <mat-panel-title>
+                    Ankieta {{ i + 1 }}
+                </mat-panel-title>
+                <mat-panel-description>
+                    Warianty Kryteria
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div>
+                <span>
+                    Najlepszy wybrany wariant: ""
+                </span>
+                <div class="matrix-container">
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                            <th></th>
+                            <th *ngFor="let alternative of receivedData.variants">{{ alternative }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let criterion of receivedData.criteria; let criterionIndex = index">
+                            <td>{{ criterion }}</td>
+                            <td *ngFor="let weight of matrix[criterionIndex]">{{ weight }}</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                </div>
+                <div>
+                    Konsykw
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <button mat-button color="accent" [routerLink]="['/set-data']">Go home</button>
+</div>
+

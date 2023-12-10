@@ -2,7 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppService } from '../app.service';
 import { Subscription } from 'rxjs';
-import { SettedData, FormAnswer } from '../interfaces';
+import { SettedData, FormAnswer, PostAnswers } from '../interfaces';
+import { MatDialog } from '@angular/material/dialog';
+import { SuccessDialogComponent } from './success-dialog.component';
 
 @Component({
   selector: 'app-compare',
@@ -14,11 +16,14 @@ export class CompareComponent implements OnDestroy {
   receivedData!: SettedData;
   comparisonValues: number[][][] = [];
   formAnswers: FormAnswer[] = [];
-  value: number = 50;
+  value: number = 1;
+  stepIndex: number = 0;
+  steps: number[] = [1/9, 1/8, 1/7, 1/6, 1/5, 1/4, 1/3, 1/2, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   constructor(
     private router: Router,
-    private appService: AppService
+    private appService: AppService,
+    private dialog: MatDialog
   ) {}
 
   ngAfterViewInit(): void {
@@ -37,7 +42,7 @@ export class CompareComponent implements OnDestroy {
         .fill([])
         .map(() => new Array(this.receivedData.variants.length)
           .fill([])
-          .map(() => new Array(this.receivedData.variants.length).fill(50))); // Default value is 50
+          .map(() => new Array(this.receivedData.variants.length).fill(50)));
     });
 
     if (!this.receivedData.name) {
@@ -57,9 +62,9 @@ export class CompareComponent implements OnDestroy {
 
                 const formAnswer: FormAnswer = {
                     criterion: this.receivedData.criteria[cIndex],
-                    varinatOne: variant1,
-                    variantTwo: variant2,
-                    count: count,
+                    varinat1: variant1,
+                    variant2: variant2,
+                    count: this.steps[count],
                 };
 
                 this.formAnswers.push(formAnswer);
@@ -67,5 +72,20 @@ export class CompareComponent implements OnDestroy {
         }
     }
     console.log('Comparison results:', this.formAnswers);
+    this.postResults(this.formAnswers);
+  }
+
+  postResults(answers: FormAnswer[]): void {
+    const postAnswers: PostAnswers = {
+      userName: this.receivedData.name,
+      answers: answers
+    }
+    console.log(postAnswers);
+
+    const dialogRef = this.dialog.open(SuccessDialogComponent);
+
+    dialogRef.componentInstance.dialogClosed.subscribe(() => {
+      this.router.navigate(['set-data']);
+    });
   }
 }

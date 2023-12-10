@@ -6,7 +6,12 @@ export interface SettedData {
 
 export interface FormAnswer {
     criterion: string;
-    varinatOne: string;
-    variantTwo: string;
+    varinat1: string;
+    variant2: string;
     count:  number;
+}
+
+export interface PostAnswers {
+    userName: string;
+    answers: FormAnswer[];
 }

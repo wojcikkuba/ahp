@@ -8,9 +8,9 @@
                     <ng-container *ngIf="i < j && variant1 !== variant2">
                         <div class="slider-item">
                             <p>{{ variant1 }}</p>
-                            <mat-slider min="0" max="100" step="1" discrete>
+                            <mat-slider [min]="0" [max]="16" [step]="1">
                                 <input matSliderThumb [(ngModel)]="comparisonValues[cIndex][i][j]">
-                            </mat-slider>
+                            </mat-slider>                            
                             <p>{{ variant2 }}</p>
                         </div>
                     </ng-container>

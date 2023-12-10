@@ -13,13 +13,17 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import {MatSliderModule} from '@angular/material/slider';
+import {MatExpansionModule} from '@angular/material/expansion';
+import { SuccessDialogComponent } from './compare/success-dialog.component';
+import {MatDialogModule} from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
     AppComponent,
     SetDataComponent,
     CompareComponent,
-    ResultsComponent
+    ResultsComponent,
+    SuccessDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -30,7 +34,9 @@ import {MatSliderModule} from '@angular/material/slider';
     MatIconModule,
     MatButtonModule,
     FormsModule,
-    MatSliderModule
+    MatSliderModule,
+    MatExpansionModule,
+    MatDialogModule
   ],
   providers: [],
   bootstrap: [AppComponent]
