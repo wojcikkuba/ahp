@@ -26,19 +26,18 @@ def calculate():
         # Obliczenia dla każdego kryterium
         results = {}
         consistency_ratios = {}
+        inconsistent_criteria = []
         for criterion, matrix in grouped_matrices.items():
             weights = calculate_priority_vector(matrix)
             results[criterion] = weights.tolist()
 
             # Obliczanie wskaźnika spójności
             eigenvalues, _ = np.linalg.eig(matrix)
-            CR = calculate_consistency_ratio(matrix, eigenvalues)
-            consistency_ratios[criterion] = CR
+            cr = calculate_consistency_ratio(matrix, eigenvalues)
+            consistency_ratios[criterion] = cr
 
-        # Sprawdzanie, czy którykolwiek CR przekracza próg 0.1
-        inconsistent_criteria = [criterion for criterion, CR in consistency_ratios.items() if CR > 0.1]
-        if inconsistent_criteria:
-            return jsonify({"error": "Inconsistent answers for criteria: " + ", ".join(inconsistent_criteria)}), 400
+            if cr > 0.1:
+                inconsistent_criteria.append(criterion)
 
         # Synteza wyników
         final_scores = np.sum([np.array(weights) for weights in results.values()], axis=0)
@@ -60,19 +59,25 @@ def calculate():
             'best_variant': best_variant,
             'results': results,
             'scores': final_scores.tolist(),
-            'consistency_ratios': consistency_ratios
+            'consistency_ratios': consistency_ratios,
+            'is_consistent': not inconsistent_criteria
         }
 
         # Zapisanie zmodyfikowanych danych do pliku
         with open(file_name, 'w') as file:
             json.dump(results_data, file, indent=4)
 
+        if inconsistent_criteria:
+            print(f"Inconsistent answers for criteria: {', '.join(inconsistent_criteria)}")
+            return jsonify({"error": "Inconsistent answers for criteria: " + ", ".join(inconsistent_criteria)}), 400
+
         # Zwracanie wyników jako odpowiedź API
         return jsonify({
             'best_variant': best_variant,
             'scores': final_scores.tolist(),
             'results': results,
-            'consistency_ratios': consistency_ratios
+            'consistency_ratios': consistency_ratios,
+            'is_consistent': True
         })
 
     except ValueError:
