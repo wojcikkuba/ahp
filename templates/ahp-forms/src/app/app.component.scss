@@ -1,0 +1,19 @@
+.forms-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+
+    .form {
+        width: 40%;
+        height: 90%;
+        border-radius: 25px;
+
+        display: inline-block;
+        padding: 10px;
+        box-shadow: 0 0 10px #3498db, 0 0 20px #3498db, 0 0 30px #3498db;
+        border: 2px solid #3498db;
+    }
+}

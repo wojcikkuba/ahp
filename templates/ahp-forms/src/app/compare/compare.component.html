@@ -1,0 +1,22 @@
+<div class="component" *ngIf="receivedData">
+    <h2>{{receivedData.name}}</h2>
+    <div class="sliders">
+        <div *ngFor="let criterion of receivedData.criteria; let cIndex = index" class="slide">
+            <p class="criterion">{{ criterion }}</p>
+            <div *ngFor="let variant1 of receivedData.variants; let i = index">
+                <div *ngFor="let variant2 of receivedData.variants; let j = index">
+                    <ng-container *ngIf="i < j && variant1 !== variant2">
+                        <div class="slider-item">
+                            <p>{{ variant1 }}</p>
+                            <mat-slider [min]="0" [max]="16" [step]="1">
+                                <input matSliderThumb [(ngModel)]="comparisonValues[cIndex][i][j]">
+                            </mat-slider>                            
+                            <p>{{ variant2 }}</p>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button mat-flat-button (click)="submitComparisonResults()">Send results</button>
+</div>
