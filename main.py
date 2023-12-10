@@ -31,7 +31,7 @@ def calculate():
         best_variant = int(np.argmax(final_scores)) + 1  # Konwersja na typ podstawowy Pythona
 
         # Odczyt i zapis do pliku JSON
-        file_name = 'C:/Users/kuba0/OneDrive/Desktop/results.json'
+        file_name = 'results.json'
         user_name = data.get('userName', 'Unknown')  # pobieranie nazwy użytkownika z danych JSON
 
         try:
