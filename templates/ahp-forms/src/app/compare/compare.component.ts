@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { SettedData, FormAnswer, PostAnswers } from '../interfaces';
 import { MatDialog } from '@angular/material/dialog';
 import { SuccessDialogComponent } from './success-dialog.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-compare',
@@ -82,10 +83,17 @@ export class CompareComponent implements OnDestroy {
     }
     console.log(postAnswers);
 
-    const dialogRef = this.dialog.open(SuccessDialogComponent);
+    this.appService.postResults(postAnswers)
+        .subscribe(response => {
+          console.log(response);
+          const dialogRef = this.dialog.open(SuccessDialogComponent);
 
-    dialogRef.componentInstance.dialogClosed.subscribe(() => {
-      this.router.navigate(['set-data']);
-    });
+          dialogRef.componentInstance.dialogClosed.subscribe(() => {
+            this.router.navigate(['set-data']);
+          });
+        },
+        (error: HttpErrorResponse) => {
+          console.log(error);
+        })
   }
 }
