@@ -1,0 +1,49 @@
+.component {
+    color: white;
+    
+    .sliders {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: column;
+        overflow: auto;
+        height: 85%;
+        width: 100%;
+        margin-top: 20px;
+        padding-top: 20px;
+    
+        .slide {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            padding: 10px 0;
+            border: solid;
+            border-width: 0 0 1px 0;
+            border-color: purple;
+    
+            .criterion {
+                font-size: 30px;
+                margin-bottom: 20px;
+            }
+        }
+    }
+    
+    .mdc-button {
+        margin-top: 20px;
+        background-color: purple;
+        width: 50%;
+        height: 45px;
+    }
+}
+
+.slider-item {
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+
+    mat-slider {
+        width: 200px;
+    }
+}

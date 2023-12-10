@@ -1,0 +1,50 @@
+<div class="component">
+    <form class="example-form">
+        <span class="text">Please enter the name of the person filling out the questionnaire</span>
+        <mat-form-field class="name-input">
+          <mat-label>Your name</mat-label>
+          <input matInput [(ngModel)]="inputName" name="inputName">
+        </mat-form-field>
+
+        <span class="text">Please enter the categories you wish to compare</span>
+        <mat-form-field class="chip-list">
+            <mat-label>Add criteria</mat-label>
+            <mat-chip-grid #chipGrid>
+                <div *ngFor="let item of criteria">
+                    <mat-chip-row (removed)="remove(item, 1)">
+                        {{item}}
+                        <button matChipRemove [attr.aria-label]="'remove ' + item">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                      </mat-chip-row>
+                </div>
+            </mat-chip-grid>
+            <input
+              [matChipInputFor]="chipGrid"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              (matChipInputTokenEnd)="add($event, 1)"/>
+        </mat-form-field>
+
+        <span class="text">Please enter the criteria by which you want to compare</span>
+        <mat-form-field class="chip-list">
+            <mat-label>Add variant</mat-label>
+            <mat-chip-grid #chipGrid2>
+                <div *ngFor="let item of variants">
+                    <mat-chip-row (removed)="remove(item, 2)">
+                        {{item}}
+                        <button matChipRemove [attr.aria-label]="'remove ' + item">
+                          <mat-icon>cancel</mat-icon>
+                        </button>
+                    </mat-chip-row>
+                </div>
+            </mat-chip-grid>
+            <input
+              [matChipInputFor]="chipGrid2"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              (matChipInputTokenEnd)="add($event, 2)"/>
+        </mat-form-field>
+
+        <button mat-flat-button class="start-btn" (click)="startFilling()">Start</button>
+    </form>
+    <button mat-button color="accent" [routerLink]="['/results']">See results ></button>
+</div>
