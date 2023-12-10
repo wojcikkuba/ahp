@@ -86,14 +86,15 @@ export class CompareComponent implements OnDestroy {
     this.appService.postResults(postAnswers)
         .subscribe(response => {
           console.log(response);
-          const dialogRef = this.dialog.open(SuccessDialogComponent);
-
-          dialogRef.componentInstance.dialogClosed.subscribe(() => {
-            this.router.navigate(['set-data']);
-          });
         },
         (error: HttpErrorResponse) => {
           console.log(error);
         })
+
+    const dialogRef = this.dialog.open(SuccessDialogComponent);
+
+    dialogRef.componentInstance.dialogClosed.subscribe(() => {
+      this.router.navigate(['set-data']);
+    });
   }
 }

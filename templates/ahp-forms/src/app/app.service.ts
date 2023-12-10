@@ -21,11 +21,6 @@ export class AppService {
   }
 
   postResults(answers: PostAnswers): Observable<any> {
-    const headers = new HttpHeaders({
-      'Accept' : '*/*',
-      'Content-Type' : 'application/json',
-    });
-    
-    return this.http.post(`http://127.0.0.1:5000/calculate`, answers, { headers: headers });
+    return this.http.post(`http://127.0.0.1:5000/calculate`, answers);
   }
 }
