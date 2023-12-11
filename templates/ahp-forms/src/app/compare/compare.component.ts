@@ -84,11 +84,13 @@ export class CompareComponent implements OnDestroy {
   
     console.log(postAnswers);
   
-    this.appService.postResults(postAnswers)
+    this.dataSubscription = this.appService.postResults(postAnswers)
       .subscribe(
         (response) => {
           console.log(response);
-          const dialogRef = this.dialog.open(SuccessDialogComponent);
+          const dialogRef = this.dialog.open(SuccessDialogComponent, {
+            data: { error: false, errorMessage: ''}
+          });
   
           dialogRef.componentInstance.dialogClosed.subscribe(() => {
             this.router.navigate(['set-data']);
