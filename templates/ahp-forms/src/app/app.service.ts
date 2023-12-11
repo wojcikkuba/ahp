@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { PostAnswers, SettedData } from './interfaces';
+import { FormResultData, PostAnswers, SettedData } from './interfaces';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -22,5 +22,9 @@ export class AppService {
 
   postResults(answers: PostAnswers): Observable<any> {
     return this.http.post(`http://127.0.0.1:5000/calculate`, answers);
+  }
+
+  getResults(): Observable<FormResultData[]> {
+    return this.http.get<FormResultData[]>(`http://127.0.0.1:5000/calculate`);
   }
 }
