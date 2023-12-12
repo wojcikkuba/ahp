@@ -49,13 +49,14 @@ def calculate():
     update_survey_with_new_answers(current_survey, user_name, new_answers)
 
     last_user_result = current_survey['wyniki'][-1]
-    if not last_user_result["is_consistent"]:
-        return jsonify({"error": "Inconsistent answers provided"}), 400
 
     aggregate_results(current_survey)
 
     with open('results.json', 'w') as file:
         json.dump(results_data, file, indent=4)
+
+    if not last_user_result["is_consistent"]:
+        return jsonify({"error": "Inconsistent answers provided"}), 400
 
     return jsonify(results_data)
 
