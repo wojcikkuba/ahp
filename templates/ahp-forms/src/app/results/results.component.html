@@ -1,41 +1,66 @@
 <div class="component">
-    <h1>Results</h1>
-    <mat-accordion #accordion class="accordion">
-        <mat-expansion-panel *ngFor="let form of forms; let i = index" #panel>
-            <mat-expansion-panel-header (click)="togglePanel(panel)">
-                <mat-panel-title>
-                    Ankieta {{ i + 1 }}
-                </mat-panel-title>
-                <mat-panel-description>
-                    Warianty Kryteria
-                </mat-panel-description>
-            </mat-expansion-panel-header>
-            <div>
-                <span>
-                    Najlepszy wybrany wariant: "Audi"
-                </span>
-                <div class="matrix-container">
-                    <table class="matrix-table">
-                        <thead>
-                            <tr>
-                            <th></th>
-                            <th *ngFor="let alternative of receivedData.variants">{{ alternative }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let criterion of receivedData.criteria; let criterionIndex = index">
-                            <td>{{ criterion }}</td>
-                            <td *ngFor="let weight of matrix[criterionIndex]">{{ weight }}</td>
-                            </tr>
-                        </tbody>
-                        </table>
-                </div>
-                <div>
-                    Użytkownik nie był konsekwentny
-                </div>
-            </div>
-        </mat-expansion-panel>
-    </mat-accordion>
-    <button mat-button color="accent" [routerLink]="['/set-data']">Go home</button>
+  <h1>Results</h1>
+  <mat-accordion #accordion class="accordion">
+    <mat-expansion-panel *ngFor="let form of forms; let i = index" #panel>
+      <mat-expansion-panel-header (click)="togglePanel(panel)">
+        <mat-panel-title>
+          {{ form.ankieta }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>
+        Variants: [{{ form.warianty.join(', ') }}]
+      </div>
+      <div>
+        Categories: [{{ form.kategorie.join(', ') }}]
+      </div>
+      <div>
+        Scores: [{{ form.scores.join(', ') }}]
+      </div>
+      <div class="border">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th *ngFor="let kategoria of form.kategorie">{{ kategoria }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Najlepsze wybrane warianty</td>
+              <td *ngFor="let kategoria of form.kategorie; let i = index">
+                {{ form.warianty[form.najlepszy_wariant[kategoria] ]}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <ng-container *ngFor="let result of form.wyniki">
+          <div *ngIf="!result.is_consistent">
+            Użytkownik {{ result.uzytkownik }} nie był konsekwentny
+          </div>
+          <div style="font-weight: 500; font-size: larger;">
+            {{ result.uzytkownik }} results:
+          </div>
+          <div class="matrix-container border">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th *ngFor="let alternative of form.warianty">{{ alternative }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let category of form.kategorie; let categoryIndex = index">
+                  <td>{{ category }}</td>
+                  <td *ngFor="let weight of result.oceny[category]">{{ weight }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+  <button mat-button color="accent" [routerLink]="['/set-data']">Go home</button>
 </div>
-

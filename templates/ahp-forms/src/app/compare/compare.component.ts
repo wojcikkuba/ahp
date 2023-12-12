@@ -17,7 +17,7 @@ export class CompareComponent implements OnDestroy {
   receivedData!: SettedData;
   comparisonValues: number[][][] = [];
   formAnswers: FormAnswer[] = [];
-  value: number = 1;
+  value: number = 8;
   stepIndex: number = 0;
   steps: number[] = [1/9, 1/8, 1/7, 1/6, 1/5, 1/4, 1/3, 1/2, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -43,7 +43,7 @@ export class CompareComponent implements OnDestroy {
         .fill([])
         .map(() => new Array(this.receivedData.variants.length)
           .fill([])
-          .map(() => new Array(this.receivedData.variants.length).fill(50)));
+          .map(() => new Array(this.receivedData.variants.length).fill(8)));
     });
 
     if (!this.receivedData.name) {
@@ -80,21 +80,33 @@ export class CompareComponent implements OnDestroy {
     const postAnswers: PostAnswers = {
       userName: this.receivedData.name,
       answers: answers
-    }
+    };
+  
     console.log(postAnswers);
-
-    this.appService.postResults(postAnswers)
-        .subscribe(response => {
+  
+    this.dataSubscription = this.appService.postResults(postAnswers)
+      .subscribe(
+        (response) => {
           console.log(response);
+          const dialogRef = this.dialog.open(SuccessDialogComponent, {
+            data: { error: false, errorMessage: ''}
+          });
+  
+          dialogRef.componentInstance.dialogClosed.subscribe(() => {
+            this.router.navigate(['set-data']);
+          });
         },
         (error: HttpErrorResponse) => {
-          console.log(error);
-        })
-
-    const dialogRef = this.dialog.open(SuccessDialogComponent);
-
-    dialogRef.componentInstance.dialogClosed.subscribe(() => {
-      this.router.navigate(['set-data']);
-    });
+          console.error(error);
+  
+          const dialogRef = this.dialog.open(SuccessDialogComponent, {
+            data: { error: true, errorMessage: error.error}
+          });
+  
+          dialogRef.componentInstance.dialogClosed.subscribe(() => {
+            this.router.navigate(['set-data']);
+          });
+        }
+      );
   }
 }

@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, json
 import numpy as np
+
 # from flask_cors import CORS
 # from itertools import combinations
+
 app = Flask(__name__)
 
 @app.route('/data', methods=['GET'])

@@ -1,12 +1,11 @@
 .component {
-    overflow: auto;
-
     h1 {
         color: white;
     }
 
     mat-accordion {
         width: 85%;
+        overflow: auto;
         
         mat-expansion-panel {
             margin-bottom: 10px;
@@ -14,18 +13,31 @@
     }
 }
 
+.user-result {
+    column-gap: 15px;
+}
+
 .matrix-container {
-    margin-top: 20px;
+    margin-top: 10px;
     overflow: auto;
 }
 
 .matrix-table {
     width: 100%;
     border-collapse: collapse;
+    margin: 10px 0;
 }
 
 .matrix-table th, .matrix-table td {
     border: 1px solid #3498db;
     padding: 8px;
     text-align: center;
+}
+
+.border {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border: solid;
+    border-width: 0 0 1px 0;
+    border-color: #34db42;
 }
