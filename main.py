@@ -1,158 +1,137 @@
 from flask import Flask, request, jsonify, json
 import numpy as np
-
+# from flask_cors import CORS
+# from itertools import combinations
 app = Flask(__name__)
+
+@app.route('/data', methods=['GET'])
+def get_data():
+    try:
+        with open('results.json', 'r') as file:
+            data = json.load(file)
+            return jsonify(data)
+    except FileNotFoundError:
+        return jsonify({"error": "File not found"}), 404
 
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
+    new_data = request.get_json()
+    user_name = new_data.get('userName', 'Unknown')
+    new_answers = new_data.get('answers', [])
+
+    if not new_answers:
+        return jsonify({"error": "No answers provided"}), 400
+
     try:
-        data = request.get_json()
-        user_name = data.get('userName', 'Unknown')
-        kategorie = data.get('kategorie', [])
-        warianty = data.get('warianty', [])
-        answers = data['answers']
+        with open('results.json', 'r') as file:
+            results_data = json.load(file)
+    except FileNotFoundError:
+        results_data = []
 
-        # Grupowanie odpowiedzi według kryteriów i tworzenie macierzy AHP
-        grouped_answers = {}
-        grouped_matrices = {}
-        for answer in answers:
-            criterion = answer['criterion']
-            if criterion not in grouped_answers:
-                grouped_answers[criterion] = []
-            grouped_answers[criterion].append(answer)
+    # Sprawdzenie, czy istnieje ankieta z takimi samymi kryteriami i wariantami
+    current_survey = None
+    for survey in results_data:
+        if set(survey['kategorie']) == set(answer['criterion'] for answer in new_answers) and \
+           set(survey['warianty']) == set(answer['variant1'] for answer in new_answers) | set(answer['variant2'] for answer in new_answers):
+            current_survey = survey
+            break
 
-        for criterion, criterion_answers in grouped_answers.items():
-            matrix = create_ahp_matrix_from_answers(criterion_answers)
-            grouped_matrices[criterion] = matrix
+    if not current_survey:
+        current_survey = create_new_survey_structure()
+        results_data.append(current_survey)
 
-        # Obliczenia dla każdego kryterium
-        results = {}
-        consistency_ratios = {}
-        inconsistent_criteria = []
-        for criterion, matrix in grouped_matrices.items():
-            weights = calculate_priority_vector(matrix)
-            results[criterion] = weights.tolist()
+    update_survey_with_new_answers(current_survey, user_name, new_answers)
+    aggregate_results(current_survey)
 
-            # Obliczanie wskaźnika spójności
-            eigenvalues, _ = np.linalg.eig(matrix)
-            cr = calculate_consistency_ratio(matrix, eigenvalues)
-            consistency_ratios[criterion] = cr
+    with open('results.json', 'w') as file:
+        json.dump(results_data, file, indent=4)
 
-            if cr > 0.1:
-                inconsistent_criteria.append(criterion)
+    return jsonify(results_data)
 
-        # Synteza wyników
-        final_scores = np.sum([np.array(weights) for weights in results.values()], axis=0)
-        best_variant = int(np.argmax(final_scores)) + 1
+def create_new_survey_structure():
+    return {
+        "ankieta": "Ankieta 1",
+        "kategorie": [],
+        "warianty": [],
+        "najlepszy_wariant": {},
+        "wyniki": []
+    }
 
-        # Przygotowanie struktury JSON z wynikami
-        survey_results = []
+def update_survey_with_new_answers(survey, user_name, new_answers):
+    user_result = {
+        "uzytkownik": user_name,
+        "oceny": {kategoria: [] for kategoria in survey['kategorie']},
+        "is_consistent": True
+    }
 
-        for criterion in kategorie:
-            survey_result = {
-                'ankieta': "Ankieta 1",  # Możesz dostosować to pole na podstawie danych wejściowych
-                'kategorie': [criterion],
-                'warianty': warianty,
-                'najlepszy_wariant': {criterion: best_variant},
-                'wyniki': []
-            }
+    for answer in new_answers:
+        criterion = answer['criterion']
+        user_result["oceny"].setdefault(criterion, []).append(answer)
 
-            for answer in answers:
-                user_result = {
-                    'uzytkownik': user_name,
-                    'oceny': {criterion: results[criterion]},
-                    'is_consistent': consistency_ratios[criterion] <= 0.1
-                }
-                survey_result['wyniki'].append(user_result)
+        if criterion not in survey['kategorie']:
+            survey['kategorie'].append(criterion)
 
-            survey_result['scores'] = final_scores.tolist()
-            survey_results.append(survey_result)
+        if answer['variant1'] not in survey['warianty']:
+            survey['warianty'].append(answer['variant1'])
+        if answer['variant2'] not in survey['warianty']:
+            survey['warianty'].append(answer['variant2'])
 
-        # Odczyt i zapis do pliku JSON
-        file_name = 'results.json'
-        try:
-            with open(file_name, 'r') as file:
-                results_data = json.load(file)
-        except FileNotFoundError:
-            results_data = {'najlepszy_wariant': None, 'Ankiety': []}
+    for kategoria in survey['kategorie']:
+        matrix = np.ones((len(survey['warianty']), len(survey['warianty'])))
+        for answer in user_result["oceny"].get(kategoria, []):
+            idx1 = survey['warianty'].index(answer['variant1'])
+            idx2 = survey['warianty'].index(answer['variant2'])
+            count = answer['count']
+            matrix[idx1, idx2] = count
+            matrix[idx2, idx1] = 1 / count if count != 0 else 1
 
-        results_data['Ankiety'].extend(survey_results)
+        cr = calculate_consistency_ratio(matrix)
+        if cr >= 0.1:
+            user_result["is_consistent"] = False
+            break
 
-        # Agregacja wyników
-        najlepszy_wariant = aggregate_results(results_data['Ankiety'])
-        results_data['najlepszy_wariant'] = najlepszy_wariant
+    survey['wyniki'].append(user_result)
 
-        with open(file_name, 'w') as file:
-            json.dump(results_data, file, indent=4)
+def aggregate_results(survey):
+    kategorie = survey['kategorie']
+    warianty = survey['warianty']
+    survey['scores'] = [0] * len(warianty)
 
-        return jsonify(survey_results)
+    for kategoria in kategorie:
+        matrix = np.ones((len(warianty), len(warianty)))
 
-    except ValueError:
-        return jsonify({"error": "Invalid data format"}), 400
+        for user_result in survey['wyniki']:
+            weight = 0.5 if not user_result['is_consistent'] else 1
+            for answer in user_result["oceny"].get(kategoria, []):
+                idx1 = warianty.index(answer['variant1'])
+                idx2 = warianty.index(answer['variant2'])
+                count = answer['count'] * weight
+                matrix[idx1, idx2] *= count
+                matrix[idx2, idx1] *= 1 / count if count != 0 else 1
 
+        weights = calculate_priority_vector(matrix)
+        best_variant_index = np.argmax(weights)
+        survey['najlepszy_wariant'][kategoria] = warianty[best_variant_index]
+        for idx, weight in enumerate(weights):
+            survey['scores'][idx] += weight
 
-def create_ahp_matrix_from_answers(answers):
-    # Funkcja tworząca macierz AHP na podstawie odpowiedzi z JSONa
-    # (Zakładamy tutaj, że mamy 3 opcje, więc macierz będzie miała wymiary 3x3)
-    matrix = np.ones((3, 3))
-    # Mapowanie nazw wariantów do indeksów macierzy
-    variant_map = {answer['varinat1']: i for i, answer in enumerate(answers)}
-    variant_map.update({answer['variant2']: i for i, answer in enumerate(answers)})
-
-    for answer in answers:
-        i = variant_map[answer['varinat1']]
-        j = variant_map[answer['variant2']]
-        count = answer['count']
-        matrix[i, j] = count
-        matrix[j, i] = 1 / count if count != 0 else 1
-
-    return matrix
-
+    # Konwersja scores do średniej ważonej dla każdego wariantu
+    survey['scores'] = [score / len(kategorie) for score in survey['scores']]
 
 def calculate_priority_vector(matrix):
-    # Obliczanie wartości własnych i wektorów własnych
-    eigenvalues, eigenvectors = np.linalg.eig(matrix)
-    max_index = np.argmax(np.real(eigenvalues))
-    max_eigenvector = np.real(eigenvectors[:, max_index])
+    eigvals, eigvecs = np.linalg.eig(matrix)
+    max_eigval_index = np.argmax(eigvals)
+    max_eigvec = np.real(eigvecs[:, max_eigval_index])
+    return max_eigvec / max_eigvec.sum()
 
-    # Normalizacja wektora własnego do uzyskania wag
-    return max_eigenvector / np.sum(max_eigenvector)
-
-
-def calculate_consistency_ratio(matrix, eigenvalues):
+def calculate_consistency_ratio(matrix):
     n = matrix.shape[0]
-    lambda_max = np.real(np.max(eigenvalues))
-    ci = (lambda_max - n) / (n - 1)  # Wskaźnik spójności (Consistency Index)
-    ri = 0.58 if n == 3 else 0  # Losowy wskaźnik spójności dla macierzy 3x3
-    cr = ci / ri if ri != 0 else 0  # Współczynnik spójności
-    return cr
-
-
-def aggregate_results(surveys):
-    suma_wag = {}
-    liczba_wag = {}
-
-    # Agregacja wyników
-    for ankieta in surveys:
-        for kategoria, wagi in ankieta['results'].items():
-            if kategoria not in suma_wag:
-                suma_wag[kategoria] = np.zeros(len(wagi))
-                liczba_wag[kategoria] = 0
-
-            mnoznik = 0.5 if not ankieta['is_consistent'] else 1
-            suma_wag[kategoria] += np.array(wagi) * mnoznik
-            liczba_wag[kategoria] += mnoznik
-
-    # Obliczanie średnich ważonych i wybór najlepszego wariantu
-    najlepszy_wariant = {}
-    for kategoria, suma in suma_wag.items():
-        srednia = suma / liczba_wag[kategoria]
-        najlepszy_wariant[kategoria] = np.argmax(srednia) + 1  # +1, ponieważ indeksowanie zaczyna się od 0
-
-    return najlepszy_wariant
-
-
+    eigvals, _ = np.linalg.eig(matrix)
+    lambda_max = np.max(np.real(eigvals))
+    ci = (lambda_max - n) / (n - 1)
+    ri = [0, 0, 0.58, 0.9][n-1]  # Przykładowe wartości RI
+    return ci / ri if ri != 0 else 0
 
 if __name__ == '__main__':
     app.run(debug=True)
