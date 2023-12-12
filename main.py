@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, json
 import numpy as np
 
-# from flask_cors import CORS
+from flask_cors import CORS
 # from itertools import combinations
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/data', methods=['GET'])
 def get_data():
@@ -91,7 +92,7 @@ def update_survey_with_new_answers(survey, user_name, new_answers):
         cr = calculate_consistency_ratio(matrix)
         if cr >= 0.1:
             user_result["is_consistent"] = False
-            break
+            break   
 
     survey['wyniki'].append(user_result)
 

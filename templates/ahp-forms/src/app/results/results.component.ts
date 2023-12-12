@@ -16,7 +16,6 @@ export class ResultsComponent implements OnInit, OnDestroy {
   private dataSubscription!: Subscription;
 
   forms!: FormResultData[];
-  // 
 
   Object = Object;
 
@@ -53,4 +52,9 @@ export class ResultsComponent implements OnInit, OnDestroy {
         }
       );
   }
+
+  getWeight(weight: any): number {
+    return weight.count;
+  }
+  
 }

@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppService } from '../app.service';
 import { Subscription } from 'rxjs';
-import { SettedData, FormAnswer, PostAnswers } from '../interfaces';
+import { SettedData, FormAnswer, PostAnswers, FormResultData } from '../interfaces';
 import { MatDialog } from '@angular/material/dialog';
 import { SuccessDialogComponent } from './success-dialog.component';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -63,7 +63,7 @@ export class CompareComponent implements OnDestroy {
 
                 const formAnswer: FormAnswer = {
                     criterion: this.receivedData.criteria[cIndex],
-                    varinat1: variant1,
+                    variant1: variant1,
                     variant2: variant2,
                     count: this.steps[count],
                 };
@@ -86,7 +86,7 @@ export class CompareComponent implements OnDestroy {
   
     this.dataSubscription = this.appService.postResults(postAnswers)
       .subscribe(
-        (response) => {
+        (response: FormResultData) => {
           console.log(response);
           const dialogRef = this.dialog.open(SuccessDialogComponent, {
             data: { error: false, errorMessage: ''}

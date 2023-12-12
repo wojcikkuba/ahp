@@ -27,8 +27,8 @@
           <tbody>
             <tr>
               <td>Najlepsze wybrane warianty</td>
-              <td *ngFor="let kategoria of form.kategorie; let i = index">
-                {{ form.warianty[form.najlepszy_wariant[kategoria] ]}}
+              <td *ngFor="let kategoria of form.kategorie">
+                {{ form.najlepszy_wariant[kategoria]}}
               </td>
             </tr>
           </tbody>
@@ -53,9 +53,9 @@
               <tbody>
                 <tr *ngFor="let category of form.kategorie; let categoryIndex = index">
                   <td>{{ category }}</td>
-                  <td *ngFor="let weight of result.oceny[category]">{{ weight }}</td>
+                  <td *ngFor="let weight of result.oceny[category]">{{ getWeight(weight) }}</td>
                 </tr>
-              </tbody>
+              </tbody>              
             </table>
           </div>
         </ng-container>
