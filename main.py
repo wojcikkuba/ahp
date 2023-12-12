@@ -7,6 +7,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+survey_count = 0
+
 @app.route('/data', methods=['GET'])
 def get_data():
     try:
@@ -53,8 +55,10 @@ def calculate():
     return jsonify(results_data)
 
 def create_new_survey_structure():
+    global survey_count
+    survey_count += 1
     return {
-        "ankieta": "Ankieta 1",
+        "ankieta": f"Ankieta {survey_count}",
         "kategorie": [],
         "warianty": [],
         "najlepszy_wariant": {},
