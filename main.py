@@ -1,12 +1,8 @@
 from flask import Flask, request, jsonify, json
 import numpy as np
-
 from flask_cors import CORS
-# from itertools import combinations
-
 app = Flask(__name__)
 CORS(app)
-
 survey_count = 0
 
 @app.route('/data', methods=['GET'])
@@ -99,21 +95,27 @@ def update_survey_with_new_answers(survey, user_name, new_answers):
             matrix[idx1, idx2] = count
             matrix[idx2, idx1] = 1 / count if count != 0 else 1
 
+        print(f"Macierz porównań parowych dla kategorii '{kategoria}':")
+        print(matrix)
+
         cr = calculate_consistency_ratio(matrix)
         if cr >= 0.1:
             user_result["is_consistent"] = False
-            break   
+            #break
 
     survey['wyniki'].append(user_result)
+
 
 def aggregate_results(survey):
     kategorie = survey['kategorie']
     warianty = survey['warianty']
     survey['scores'] = [0] * len(warianty)
 
+    # Iteracja przez każdą kategorię, aby stworzyć macierz porównań parowych
     for kategoria in kategorie:
         matrix = np.ones((len(warianty), len(warianty)))
 
+        # Iteracja przez wyniki wszystkich użytkowników
         for user_result in survey['wyniki']:
             weight = 0.5 if not user_result['is_consistent'] else 1
             for answer in user_result["oceny"].get(kategoria, []):
@@ -123,14 +125,22 @@ def aggregate_results(survey):
                 matrix[idx1, idx2] *= count
                 matrix[idx2, idx1] *= 1 / count if count != 0 else 1
 
+        # Print the comparison matrix for the current category
+        print(f"Zagregowana macierz porównań parowych dla kategorii '{kategoria}':")
+        print(matrix)
+
+        # Obliczenie wektora priorytetów dla bieżącej macierzy
         weights = calculate_priority_vector(matrix)
         best_variant_index = np.argmax(weights)
         survey['najlepszy_wariant'][kategoria] = warianty[best_variant_index]
+
+        # Dodanie wag dla każdego wariantu
         for idx, weight in enumerate(weights):
             survey['scores'][idx] += weight
 
-    # Konwersja scores do średniej ważonej dla każdego wariantu
+    # Normalizacja wyników - konwersja scores do średniej ważonej dla każdego wariantu
     survey['scores'] = [score / len(kategorie) for score in survey['scores']]
+
 
 def calculate_priority_vector(matrix):
     eigvals, eigvecs = np.linalg.eig(matrix)

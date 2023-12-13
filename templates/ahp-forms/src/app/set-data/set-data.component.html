@@ -6,7 +6,7 @@
           <input matInput [(ngModel)]="inputName" name="inputName">
         </mat-form-field>
 
-        <span class="text">Please enter the categories you wish to compare</span>
+        <span class="text">Please enter the categories by which you want to compare</span>
         <mat-form-field class="chip-list">
             <mat-label>Add criteria</mat-label>
             <mat-chip-grid #chipGrid>
@@ -25,7 +25,7 @@
               (matChipInputTokenEnd)="add($event, 1)"/>
         </mat-form-field>
 
-        <span class="text">Please enter the criteria by which you want to compare</span>
+        <span class="text">Please enter the variants which you want to compare</span>
         <mat-form-field class="chip-list">
             <mat-label>Add variant</mat-label>
             <mat-chip-grid #chipGrid2>
