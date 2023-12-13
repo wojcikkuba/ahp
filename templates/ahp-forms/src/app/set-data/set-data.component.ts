@@ -1,11 +1,9 @@
-import { Component, ElementRef, ViewChild, inject } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { SettedData } from '../interfaces';
-import { AppRoutingModule } from '../app-routing.module';
 import { AppService } from '../app.service';
 
 @Component({
